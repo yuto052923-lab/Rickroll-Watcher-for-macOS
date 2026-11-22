@@ -17,28 +17,53 @@ rm -rf rickroll.app StopWatcher.app UninstallWatcher.app \
 osacompile -s -o rickroll.app main.applescript
 swiftc player.swift -o rickroll.app/Contents/Resources/player
 
-# 3. リソース配置とInfo.plist設定（Dock非表示・固有ID付与）
 # 3. 動画の自動取得（キャッシュがなければダウンロード）とリソース配置
-VIDEO_URL="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
-
-# 3. 動画の自動取得（uv環境にも対応）とリソース配置
 VIDEO_URL="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
 export PATH="$HOME/.local/bin:$PATH"
 
 if [ ! -f "rickroll.mp4" ]; then
   if [ -f "$HOME/Movies/rickroll.mp4" ]; then
     cp "$HOME/Movies/rickroll.mp4" rickroll.mp4
-  elif command -v yt-dlp >/dev/null 2>&1; then
-    yt-dlp -f "bestvideo[ext=mp4]+bestaudio[ext=m4a]/mp4" --merge-output-format mp4 -o "rickroll.mp4" "$VIDEO_URL"
-  elif command -v uv >/dev/null 2>&1; then
-    echo "Downloading rickroll.mp4 via uv..."
-    uv run yt-dlp -f "bestvideo[ext=mp4]+bestaudio[ext=m4a]/mp4" --merge-output-format mp4 -o "rickroll.mp4" "$VIDEO_URL" 2>/dev/null || \
-    uvx yt-dlp -f "bestvideo[ext=mp4]+bestaudio[ext=m4a]/mp4" --merge-output-format mp4 -o "rickroll.mp4" "$VIDEO_URL"
   else
-    echo "Error: rickroll.mp4 not found. Install yt-dlp or place rickroll.mp4 in this folder."
-    exit 1
+    rm -f rickroll_tmp.*(N)
+    YT_ARGS=(-f "bestvideo[vcodec^=avc][ext=mp4]+bestaudio[ext=m4a]" --merge-output-format mp4 -o "rickroll_tmp.%(ext)s" "$VIDEO_URL")
+    if command -v yt-dlp >/dev/null 2>&1; then
+      yt-dlp "${YT_ARGS[@]}"
+    elif command -v uv >/dev/null 2>&1; then
+      uv run yt-dlp "${YT_ARGS[@]}" 2>/dev/null || uvx yt-dlp "${YT_ARGS[@]}"
+    else
+      echo "Error: yt-dlp not found."
+      exit 1
+    fi
+
+    if [ -f "rickroll_tmp.mp4" ]; then
+      mv rickroll_tmp.mp4 rickroll.mp4
+    else
+      V_FILE=$(ls rickroll_tmp.f*.mp4 | head -n 1)
+      A_FILE=$(ls rickroll_tmp.f*.m4a | head -n 1)
+      swift -e '
+        import AVFoundation; import Foundation
+        let comp = AVMutableComposition()
+        let vAsset = AVURLAsset(url: URL(fileURLWithPath: CommandLine.arguments[1]))
+        let aAsset = AVURLAsset(url: URL(fileURLWithPath: CommandLine.arguments[2]))
+        if let vt = vAsset.tracks(withMediaType: .video).first, let cv = comp.addMutableTrack(withMediaType: .video, preferredTrackID: kCMPersistentTrackID_Invalid) {
+            try? cv.insertTimeRange(CMTimeRange(start: .zero, duration: vAsset.duration), of: vt, at: .zero)
+        }
+        if let at = aAsset.tracks(withMediaType: .audio).first, let ca = comp.addMutableTrack(withMediaType: .audio, preferredTrackID: kCMPersistentTrackID_Invalid) {
+            try? ca.insertTimeRange(CMTimeRange(start: .zero, duration: aAsset.duration), of: at, at: .zero)
+        }
+        let sem = DispatchSemaphore(value: 0)
+        let exp = AVAssetExportSession(asset: comp, presetName: AVAssetExportPresetPassthrough)!
+        exp.outputURL = URL(fileURLWithPath: CommandLine.arguments[3])
+        exp.outputFileType = .mp4
+        exp.exportAsynchronously { sem.signal() }
+        sem.wait()
+      ' "$V_FILE" "$A_FILE" "rickroll.mp4"
+      rm -f rickroll_tmp.*(N)
+    fi
   fi
 fi
+
 
 cp config.json rickroll.app/Contents/Resources/
 cp rickroll.mp4 rickroll.app/Contents/Resources/
