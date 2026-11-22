@@ -17,3 +17,5 @@ distribution.xml
 *.mov
 .DS_Store
 *.tar.gz
+*.part
+*.m4a
