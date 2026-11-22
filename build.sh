@@ -22,7 +22,7 @@ swiftc player.swift -o rickroll.app/Contents/Resources/player
 VIDEO_URL="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
 
 # 3. 動画の自動取得（uv環境にも対応）とリソース配置
-VIDEO_URL="https://youtube.com"
+VIDEO_URL="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
 export PATH="$HOME/.local/bin:$PATH"
 
 if [ ! -f "rickroll.mp4" ]; then
