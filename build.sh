@@ -18,12 +18,23 @@ osacompile -s -o rickroll.app main.applescript
 swiftc player.swift -o rickroll.app/Contents/Resources/player
 
 # 3. リソース配置とInfo.plist設定（Dock非表示・固有ID付与）
-cp config.json rickroll.app/Contents/Resources/
-if [ -f "rickroll.mp4" ]; then
-  cp rickroll.mp4 rickroll.app/Contents/Resources/
-else
-  cp "$HOME/Movies/rickroll.mp4" rickroll.app/Contents/Resources/
+# 3. 動画の自動取得（キャッシュがなければダウンロード）とリソース配置
+VIDEO_URL="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+
+if [ ! -f "rickroll.mp4" ]; then
+  if [ -f "$HOME/Movies/rickroll.mp4" ]; then
+    cp "$HOME/Movies/rickroll.mp4" rickroll.mp4
+  elif command -v yt-dlp >/dev/null 2>&1; then
+    echo "Downloading rickroll.mp4 via yt-dlp..."
+    yt-dlp -f "bestvideo[ext=mp4]+bestaudio[ext=m4a]/mp4" --merge-output-format mp4 -o "rickroll.mp4" "$VIDEO_URL"
+  else
+    echo "Error: rickroll.mp4 not found. Install yt-dlp (brew install yt-dlp) or place rickroll.mp4 in this folder."
+    exit 1
+  fi
 fi
+
+cp config.json rickroll.app/Contents/Resources/
+cp rickroll.mp4 rickroll.app/Contents/Resources/
 plutil -replace LSUIElement -bool true rickroll.app/Contents/Info.plist
 plutil -replace CFBundleIdentifier -string "local.dev.rickroll.watcher" rickroll.app/Contents/Info.plist
 plutil -replace CFBundleShortVersionString -string "$VERSION" rickroll.app/Contents/Info.plist
