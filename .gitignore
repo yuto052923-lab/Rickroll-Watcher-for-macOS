@@ -16,3 +16,4 @@ distribution.xml
 *.mp4
 *.mov
 .DS_Store
+*.tar.gz
