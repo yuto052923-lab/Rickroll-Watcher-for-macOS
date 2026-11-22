@@ -1,0 +1,2 @@
+do shell script "pkill -f \"rickroll.app/Contents/MacOS/applet\" 2>/dev/null || true; killall player 2>/dev/null || true; rm -rf \"$HOME/Applications/rickroll.app\" \"$HOME/Applications/StopWatcher.app\" \"$HOME/Applications/UninstallWatcher.app\" \"$HOME/Library/Application Support/RickrollWatcher\" /tmp/rickroll.log; pkgutil --forget local.dev.rickroll.pkg 2>/dev/null || true"
+display dialog "Rickroll Watcher has been uninstalled." buttons {"OK"} giving up after 2

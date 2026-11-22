@@ -1,0 +1,18 @@
+# ビルド成果物・インストーラー（Releasesで配布する）
+*.app/
+*.pkg
+
+# 一時ファイル・ログ
+*.png
+*.icns
+*.iconset/
+component.plist
+pkg_root/
+pkg_scripts/
+pkg_resources/
+distribution.xml
+
+# 動画ファイル・OS固有ファイル
+*.mp4
+*.mov
+.DS_Store
