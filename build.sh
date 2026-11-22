@@ -21,20 +21,28 @@ swiftc player.swift -o rickroll.app/Contents/Resources/player
 # 3. 動画の自動取得（キャッシュがなければダウンロード）とリソース配置
 VIDEO_URL="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
 
+# 3. 動画の自動取得（uv環境にも対応）とリソース配置
+VIDEO_URL="https://youtube.com"
+export PATH="$HOME/.local/bin:$PATH"
+
 if [ ! -f "rickroll.mp4" ]; then
   if [ -f "$HOME/Movies/rickroll.mp4" ]; then
     cp "$HOME/Movies/rickroll.mp4" rickroll.mp4
   elif command -v yt-dlp >/dev/null 2>&1; then
-    echo "Downloading rickroll.mp4 via yt-dlp..."
     yt-dlp -f "bestvideo[ext=mp4]+bestaudio[ext=m4a]/mp4" --merge-output-format mp4 -o "rickroll.mp4" "$VIDEO_URL"
+  elif command -v uv >/dev/null 2>&1; then
+    echo "Downloading rickroll.mp4 via uv..."
+    uv run yt-dlp -f "bestvideo[ext=mp4]+bestaudio[ext=m4a]/mp4" --merge-output-format mp4 -o "rickroll.mp4" "$VIDEO_URL" 2>/dev/null || \
+    uvx yt-dlp -f "bestvideo[ext=mp4]+bestaudio[ext=m4a]/mp4" --merge-output-format mp4 -o "rickroll.mp4" "$VIDEO_URL"
   else
-    echo "Error: rickroll.mp4 not found. Install yt-dlp (brew install yt-dlp) or place rickroll.mp4 in this folder."
+    echo "Error: rickroll.mp4 not found. Install yt-dlp or place rickroll.mp4 in this folder."
     exit 1
   fi
 fi
 
 cp config.json rickroll.app/Contents/Resources/
 cp rickroll.mp4 rickroll.app/Contents/Resources/
+
 plutil -replace LSUIElement -bool true rickroll.app/Contents/Info.plist
 plutil -replace CFBundleIdentifier -string "local.dev.rickroll.watcher" rickroll.app/Contents/Info.plist
 plutil -replace CFBundleShortVersionString -string "$VERSION" rickroll.app/Contents/Info.plist
