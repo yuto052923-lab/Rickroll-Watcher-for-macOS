@@ -6,10 +6,10 @@ VERSION="1.1.11"
 pkill -f "rickroll.app/Contents/MacOS/applet" 2>/dev/null || true
 killall player 2>/dev/null || true
 sleep 0.3
-rm -rf rickroll.app StopWatcher.app UninstallWatcher.app \
-  watcher.png stop.png uninstall.png \
-  watcher.iconset stop.iconset uninstall.iconset \
-  watcher.icns stop.icns uninstall.icns \
+rm -rf rickroll.app StopWatcher.app UninstallWatcher.app Configure.app \
+  watcher.png stop.png uninstall.png config.png \
+  watcher.iconset stop.iconset uninstall.iconset config.iconset \
+  watcher.icns stop.icns uninstall.icns config.icns \
   pkg_root pkg_scripts component.plist component.pkg distribution.xml RickrollInstaller-v${VERSION}.pkg \
   /tmp/rickroll.log
 
@@ -91,7 +91,7 @@ plutil -replace CFBundleShortVersionString -string "$VERSION" Configure.app/Cont
 
 # 7. アイコンの生成と変換（.png -> .iconset -> .icns）
 swift make_icon.swift
-for name in watcher stop uninstall; do
+for name in watcher stop uninstall config; do
   mkdir -p "${name}.iconset"
   for sz in 16 32 128 256 512; do
     sips -z $sz $sz "${name}.png" --out "${name}.iconset/icon_${sz}x${sz}.png" >/dev/null
@@ -105,7 +105,7 @@ done
 cp watcher.icns rickroll.app/Contents/Resources/custom.icns
 cp stop.icns StopWatcher.app/Contents/Resources/custom.icns
 cp uninstall.icns UninstallWatcher.app/Contents/Resources/custom.icns
-cp watcher.icns Configure.app/Contents/Resources/custom.icns
+cp config.icns Configure.app/Contents/Resources/custom.icns
 plutil -replace CFBundleIconFile -string "custom" rickroll.app/Contents/Info.plist
 plutil -replace CFBundleIconFile -string "custom" StopWatcher.app/Contents/Info.plist
 plutil -replace CFBundleIconFile -string "custom" UninstallWatcher.app/Contents/Info.plist
@@ -118,8 +118,8 @@ codesign --force --deep --sign - UninstallWatcher.app
 codesign --force --deep --sign - Configure.app
 
 # 10. Finderアイコンキャッシュの強制上書きと一時ファイル削除
-swift -e 'import Cocoa; NSWorkspace.shared.setIcon(NSImage(contentsOfFile: "watcher.icns"), forFile: "rickroll.app", options: []); NSWorkspace.shared.setIcon(NSImage(contentsOfFile: "stop.icns"), forFile: "StopWatcher.app", options: []); NSWorkspace.shared.setIcon(NSImage(contentsOfFile: "uninstall.icns"), forFile: "UninstallWatcher.app", options: []); NSWorkspace.shared.setIcon(NSImage(contentsOfFile: "watcher.icns"), forFile: "Configure.app", options: [])'
-rm -rf watcher.png stop.png uninstall.png watcher.iconset stop.iconset uninstall.iconset watcher.icns stop.icns uninstall.icns
+swift -e 'import Cocoa; NSWorkspace.shared.setIcon(NSImage(contentsOfFile: "watcher.icns"), forFile: "rickroll.app", options: []); NSWorkspace.shared.setIcon(NSImage(contentsOfFile: "stop.icns"), forFile: "StopWatcher.app", options: []); NSWorkspace.shared.setIcon(NSImage(contentsOfFile: "uninstall.icns"), forFile: "UninstallWatcher.app", options: []); NSWorkspace.shared.setIcon(NSImage(contentsOfFile: "watcher.icns"), forFile: "Configure.app", options: []);  NSWorkspace.shared.setIcon(NSImage(contentsOfFile: "config.icns"), forFile: "Configure.app", options: [])'
+rm -rf watcher.png stop.png uninstall.png config.png watcher.iconset stop.iconset uninstall.iconset config.iconset watcher.icns stop.icns uninstall.icns config.icns
 
 # 11. 管理者権限不要・使い方表示付きの .pkg 生成
 mkdir -p pkg_root pkg_scripts pkg_resources
