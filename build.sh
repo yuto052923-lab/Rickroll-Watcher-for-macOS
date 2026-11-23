@@ -1,6 +1,6 @@
 #!/bin/zsh
 set -e
-VERSION="1.1.01"
+VERSION="1.1.11"
 
 # 1. 既存プロセスの停止と前回ビルド物の削除
 pkill -f "rickroll.app/Contents/MacOS/applet" 2>/dev/null || true
