@@ -118,7 +118,7 @@ codesign --force --deep --sign - UninstallWatcher.app
 codesign --force --deep --sign - Configure.app
 
 # 10. Finderアイコンキャッシュの強制上書きと一時ファイル削除
-swift -e 'import Cocoa; NSWorkspace.shared.setIcon(NSImage(contentsOfFile: "watcher.icns"), forFile: "rickroll.app", options: []); NSWorkspace.shared.setIcon(NSImage(contentsOfFile: "stop.icns"), forFile: "StopWatcher.app", options: []); NSWorkspace.shared.setIcon(NSImage(contentsOfFile: "uninstall.icns"), forFile: "UninstallWatcher.app", options: [])'
+swift -e 'import Cocoa; NSWorkspace.shared.setIcon(NSImage(contentsOfFile: "watcher.icns"), forFile: "rickroll.app", options: []); NSWorkspace.shared.setIcon(NSImage(contentsOfFile: "stop.icns"), forFile: "StopWatcher.app", options: []); NSWorkspace.shared.setIcon(NSImage(contentsOfFile: "uninstall.icns"), forFile: "UninstallWatcher.app", options: []); NSWorkspace.shared.setIcon(NSImage(contentsOfFile: "watcher.icns"), forFile: "Configure.app", options: [])'
 rm -rf watcher.png stop.png uninstall.png watcher.iconset stop.iconset uninstall.iconset watcher.icns stop.icns uninstall.icns
 
 # 11. 管理者権限不要・使い方表示付きの .pkg 生成
