@@ -10,7 +10,7 @@ rm -rf rickroll.app StopWatcher.app UninstallWatcher.app Configure.app \
   watcher.png stop.png uninstall.png config.png \
   watcher.iconset stop.iconset uninstall.iconset config.iconset \
   watcher.icns stop.icns uninstall.icns config.icns \
-  pkg_root pkg_scripts component.plist component.pkg distribution.xml RickrollInstaller-v${VERSION}.pkg \
+  pkg_root pkg_scripts component.plist component.pkg distribution.xml RickrollInstaller-v*.pkg \
   /tmp/rickroll.log
 
 # 2. 本体アプリとボーダーレスプレイヤーのビルド
