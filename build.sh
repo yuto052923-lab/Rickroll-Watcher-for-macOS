@@ -105,6 +105,7 @@ done
 cp watcher.icns rickroll.app/Contents/Resources/custom.icns
 cp stop.icns StopWatcher.app/Contents/Resources/custom.icns
 cp uninstall.icns UninstallWatcher.app/Contents/Resources/custom.icns
+cp watcher.icns Configure.app/Contents/Resources/custom.icns
 plutil -replace CFBundleIconFile -string "custom" rickroll.app/Contents/Info.plist
 plutil -replace CFBundleIconFile -string "custom" StopWatcher.app/Contents/Info.plist
 plutil -replace CFBundleIconFile -string "custom" UninstallWatcher.app/Contents/Info.plist
